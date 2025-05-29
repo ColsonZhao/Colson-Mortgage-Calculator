@@ -612,3 +612,17 @@ h3.subtitle {
 .verify-btn:hover {
     background-color: #2980b9;
 }
+
+/* 金额汇总样式 */
+#reduce-term-summary,
+#reduce-payment-summary {
+    margin-top: 10px;
+    border-top: 1px dotted #eee;
+    padding-top: 10px;
+}
+
+#reduce-term-summary .result-value,
+#reduce-payment-summary .result-value {
+    color: #3498db;
+    font-weight: 700;
+}
