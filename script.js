@@ -74,6 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedInterestReducePaymentElement = document.getElementById('saved-interest-reduce-payment');
     const newMonthlyPaymentElement = document.getElementById('new-monthly-payment');
     
+    // 新增金额汇总相关DOM元素
+    const reduceTermSummary = document.getElementById('reduce-term-summary');
+    const reduceTermSummaryValue = document.getElementById('reduce-term-summary-value');
+    const reducePaymentSummary = document.getElementById('reduce-payment-summary');
+    const reducePaymentSummaryValue = document.getElementById('reduce-payment-summary-value');
     const comparisonModal = document.getElementById('comparison-modal');
     const closeBtn = document.querySelector('.close-btn');
     const selectedPeriodElement = document.getElementById('selected-period');
@@ -345,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             paidInterest += globalPaymentSchedule[i].interest;
         }
         
-        // 计算剩余利息节省（全部提前还款）
+        // 计算剩余待缴纳利息（原为剩余利息节省）
         let savedInterest = 0;
         for (let i = currentPeriod; i < globalPaymentSchedule.length; i++) {
             savedInterest += globalPaymentSchedule[i].interest;
@@ -400,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 方案1：保持月供不变，缩短贷款期限
         let newTerm = 0;
         let savedInterestReduceTerm = 0;
+        let newTotalInterestReduceTerm = 0;
         
         if (isEqualPrincipalInterest) {
             // 等额本息
@@ -411,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 计算新的总利息
             const newTotalPayment = monthlyPayment * newTerm;
-            const newTotalInterest = newTotalPayment - newRemainingPrincipal;
+            newTotalInterestReduceTerm = newTotalPayment - newRemainingPrincipal;
             
             // 计算原计划剩余利息
             let originalRemainingInterest = 0;
@@ -420,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 计算节省的利息
-            savedInterestReduceTerm = originalRemainingInterest - newTotalInterest;
+            savedInterestReduceTerm = originalRemainingInterest - newTotalInterestReduceTerm;
         } else {
             // 等额本金
             const monthlyPrincipal = globalPaymentSchedule[0].principal;
@@ -429,12 +435,12 @@ document.addEventListener('DOMContentLoaded', function() {
             newTerm = Math.ceil(newRemainingPrincipal / monthlyPrincipal);
             
             // 计算新的总利息
-            let newTotalInterest = 0;
+            newTotalInterestReduceTerm = 0;
             let tempRemainingPrincipal = newRemainingPrincipal;
             
             for (let i = 0; i < newTerm; i++) {
                 const interest = tempRemainingPrincipal * monthlyInterestRate;
-                newTotalInterest += interest;
+                newTotalInterestReduceTerm += interest;
                 tempRemainingPrincipal -= monthlyPrincipal;
             }
             
@@ -445,12 +451,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 计算节省的利息
-            savedInterestReduceTerm = originalRemainingInterest - newTotalInterest;
+            savedInterestReduceTerm = originalRemainingInterest - newTotalInterestReduceTerm;
         }
         
         // 方案2：保持贷款期限不变，减少月供金额
         let newMonthlyPayment = 0;
         let savedInterestReducePayment = 0;
+        let newTotalInterestReducePayment = 0;
         
         if (isEqualPrincipalInterest) {
             // 等额本息
@@ -460,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 计算新的总利息
             const newTotalPayment = newMonthlyPayment * remainingMonths;
-            const newTotalInterest = newTotalPayment - newRemainingPrincipal;
+            newTotalInterestReducePayment = newTotalPayment - newRemainingPrincipal;
             
             // 计算原计划剩余利息
             let originalRemainingInterest = 0;
@@ -469,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 计算节省的利息
-            savedInterestReducePayment = originalRemainingInterest - newTotalInterest;
+            savedInterestReducePayment = originalRemainingInterest - newTotalInterestReducePayment;
         } else {
             // 等额本金
             // 计算新的月供（首月）
@@ -477,12 +484,12 @@ document.addEventListener('DOMContentLoaded', function() {
             newMonthlyPayment = newMonthlyPrincipal + newRemainingPrincipal * monthlyInterestRate;
             
             // 计算新的总利息
-            let newTotalInterest = 0;
+            newTotalInterestReducePayment = 0;
             let tempRemainingPrincipal = newRemainingPrincipal;
             
             for (let i = 0; i < remainingMonths; i++) {
                 const interest = tempRemainingPrincipal * monthlyInterestRate;
-                newTotalInterest += interest;
+                newTotalInterestReducePayment += interest;
                 tempRemainingPrincipal -= newMonthlyPrincipal;
             }
             
@@ -493,8 +500,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 计算节省的利息
-            savedInterestReducePayment = originalRemainingInterest - newTotalInterest;
+            savedInterestReducePayment = originalRemainingInterest - newTotalInterestReducePayment;
         }
+        
+        // 计算金额汇总
+        // 方案1：保持月供不变，缩短贷款期限的金额汇总
+        const reduceTermSummaryAmount = newRemainingPrincipal + newTotalInterestReduceTerm;
+        
+        // 方案2：保持贷款期限不变，减少月供金额的金额汇总
+        const reducePaymentSummaryAmount = newRemainingPrincipal + newTotalInterestReducePayment;
         
         // 更新显示
         savedInterestReduceTermElement.textContent = formatCurrency(savedInterestReduceTerm);
@@ -502,17 +516,27 @@ document.addEventListener('DOMContentLoaded', function() {
         savedInterestReducePaymentElement.textContent = formatCurrency(savedInterestReducePayment);
         newMonthlyPaymentElement.textContent = formatCurrency(newMonthlyPayment);
         
+        // 显示金额汇总
+        reduceTermSummary.style.display = 'block';
+        reduceTermSummaryValue.textContent = formatCurrency(reduceTermSummaryAmount);
+        reducePaymentSummary.style.display = 'block';
+        reducePaymentSummaryValue.textContent = formatCurrency(reducePaymentSummaryAmount);
+        
         // 根据用户选择的调整方式高亮显示对应结果
         if (reduceTermRadio.checked) {
             document.getElementById('saved-interest-reduce-term').parentNode.classList.add('highlighted-result');
             document.getElementById('new-term').parentNode.classList.add('highlighted-result');
+            document.getElementById('reduce-term-summary').classList.add('highlighted-result');
             document.getElementById('saved-interest-reduce-payment').parentNode.classList.remove('highlighted-result');
             document.getElementById('new-monthly-payment').parentNode.classList.remove('highlighted-result');
+            document.getElementById('reduce-payment-summary').classList.remove('highlighted-result');
         } else {
             document.getElementById('saved-interest-reduce-term').parentNode.classList.remove('highlighted-result');
             document.getElementById('new-term').parentNode.classList.remove('highlighted-result');
+            document.getElementById('reduce-term-summary').classList.remove('highlighted-result');
             document.getElementById('saved-interest-reduce-payment').parentNode.classList.add('highlighted-result');
             document.getElementById('new-monthly-payment').parentNode.classList.add('highlighted-result');
+            document.getElementById('reduce-payment-summary').classList.add('highlighted-result');
         }
     }
     
