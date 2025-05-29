@@ -52,6 +52,7 @@
                             <option value="15">15年</option>
                             <option value="20">20年</option>
                             <option value="25">25年</option>
+                            <option value="27">27年</option>
                             <option value="30" selected>30年</option>
                         </select>
                     </div>
@@ -143,13 +144,13 @@
                 
                 <!-- 提前还款分析区域（默认隐藏） -->
                 <div id="early-repayment-section" class="early-repayment-section" style="display: none;">
-                    <h3>提前还款分析</h3>
+                    <h3>房贷利息分析</h3>
                     <div class="result-item">
                         <div class="result-label">已还利息总额</div>
                         <div id="paid-interest" class="result-value">¥0.00</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-label">剩余利息节省</div>
+                        <div class="result-label">剩余待缴纳利息</div>
                         <div id="saved-interest" class="result-value">¥0.00</div>
                     </div>
                     
@@ -168,6 +169,10 @@
                             <div class="result-label">新贷款期限（保持月供不变）</div>
                             <div id="new-term" class="result-value">0期</div>
                         </div>
+                        <div class="result-item" id="reduce-term-summary" style="display: none;">
+                            <div class="result-label">新剩余房贷金额（保持月供不变）</div>
+                            <div id="reduce-term-summary-value" class="result-value">¥0.00</div>
+                        </div>
                         <div class="result-item">
                             <div class="result-label">节省利息（保持期限不变）</div>
                             <div id="saved-interest-reduce-payment" class="result-value">¥0.00</div>
@@ -175,6 +180,10 @@
                         <div class="result-item">
                             <div class="result-label">新月供金额（保持期限不变）</div>
                             <div id="new-monthly-payment" class="result-value">¥0.00</div>
+                        </div>
+                        <div class="result-item" id="reduce-payment-summary" style="display: none;">
+                            <div class="result-label">新剩余房贷金额（保持期限不变）</div>
+                            <div id="reduce-payment-summary-value" class="result-value">¥0.00</div>
                         </div>
                     </div>
                 </div>
